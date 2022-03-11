@@ -1,5 +1,4 @@
 # Libraries
-from ast import While
 import json
 import requests
 
@@ -63,20 +62,25 @@ class channel():
 
 class video():
     # Initialize object
-    def __init__(self, id):
+    def __init__(self, id=None, key=None):
         self.id = id
 
     # Get video's details (title, tags, etc)
     def get_details(self):
         """
-        snippet
-            title
-            description
-            tags
-        contentDetails
-            duration
-        liveStreamingDetails
-            If None => Normal upload
+        https://youtube.googleapis.com/youtube/v3/videos?
+        part=snippet&
+        part=contentDetails&
+        id=uDjeOcBPxfk&
+        fields=
+            items(snippet%2FpublishedAt)%2C%20
+            items(snippet%2Ftitle)%2C%20
+            items(snippet%2Fdescription)%2C%20
+            items(snippet%2Ftags)%2C%20
+            items(snippet%2FliveBroadcastContent)%2C%20
+            items(contentDetails%2Fduration)%2C%20
+            items(contentDetails%2Fdefinition)&
+        key=[YOUR_API_KEY]
         """
     
     # Get video's top-level comments
