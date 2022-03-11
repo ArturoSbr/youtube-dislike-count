@@ -2,62 +2,83 @@
 import json
 import requests
 
-# Youtube class
+# Channel class
 class channel():
     # Initialize channel
     def __init__(self, id=None, key=None):
         self.id = id
         self.key = key
         self.name = None
-        self.joined = None
 
     # Get channel's title, join date and metrics
-    def get_statistics(self):
+    def get_info(self):
         url = 'https://youtube.googleapis.com/youtube/v3/channels?' + \
-            f'part=statistics&part=snippet&id={self.id}&' + \
-            f'fields=items(statistics%2Csnippet%2Ftitle%2Csnippet%2FpublishedAt)&key={self.key}'
-        r = json.loads(requests.get(url).text)
-        self.name = r['items'][0]['snippet']['title']
-        self.joinDate = r['items'][0]['snippet']['publishedAt'][:10]
-        return r['items'][0]['statistics']
+            'part=snippet&' + \
+            'part=statistics&' + \
+            f'id={self.id}&' + \
+            'fields=' + \
+                'items(' + \
+                    'snippet%2Ftitle%2C' + \
+                    'snippet%2FpublishedAt%2C' + \
+                    'statistics%2FviewCount)' + \
+            f'&key={self.key}'
+        r = json.loads(requests.get(url).text)['items'][0]
+        self.name = r['snippet']['title']
+        return [r['snippet']['title'], r['snippet']['publishedAt'][:10], r['statistics']['viewCount']]
     
     # Get channel's videos between two dates
-    def get_videos(self, date0=None, date1=None):
+    def get_videos(self, category=25, date0=None, date1=None):
         date0 = date0.replace(':','%3A')
         date1 = date1.replace(':','%3A')
         ret = []
 
-        # Get first request
+        # Get first page
         url = 'https://youtube.googleapis.com/youtube/v3/search?' + \
-            f'part=id&part=snippet&channelId={self.id}&maxResults=50&order=relevance&' + \
-            f'publishedAfter={date0}Z&publishedBefore={date1}Z&' + \
-            'safeSearch=none&type=video&videoCategoryId=25&' + \
-            f'fields=items(id%2FvideoId)%2Citems(snippet%2FpublishedAt)&key={self.key}'
-        print(url)
+            'part=id&' + \
+            f'channelId={self.id}&' + \
+            'maxResults=50&' + \
+            'order=relevance&' + \
+            f'publishedAfter={date0}Z&' + \
+            f'publishedBefore={date1}Z&' + \
+            'safeSearch=none&' + \
+            'type=video&' + \
+            f'videoCategoryId={25}&' + \
+            'fields=' + \
+                'nextPageToken%2C%20' + \
+                'items(id%2FvideoId)&' + \
+            f'key={self.key}'
         r = json.loads(requests.get(url).text)
         try:
             npt = r['nextPageToken']
         except:
             npt = None
         for i in range(len(r['items'])):
-            ret.append((r['items'][i]['id']['videoId'], r['items'][i]['snippet']['publishedAt']))
+            ret.append(r['items'][i]['id']['videoId'])
 
         # Get subsequent requests
         while npt is not None:
             url = 'https://youtube.googleapis.com/youtube/v3/search?' + \
-                f'part=id&part=snippet&channelId={self.id}&maxResults=50&order=relevance&' + \
-                f'publishedAfter={date0}Z&publishedBefore={date1}Z&' + \
-                f'safeSearch=none&type=video&videoCategoryId=25&pageToken={npt}' + \
-                f'fields=items(id%2FvideoId)%2Citems(snippet%2FpublishedAt)&key={self.key}'
-            print(url)
+                'part=id&' + \
+                f'channelId={self.id}&' + \
+                'maxResults=50&' + \
+                'order=relevance&' + \
+                f'publishedAfter={date0}Z&' + \
+                f'publishedBefore={date1}Z&' + \
+                'safeSearch=none&' + \
+                'type=video&' + \
+                f'videoCategoryId={25}&' + \
+                'fields=' + \
+                    'nextPageToken%2C%20' + \
+                    'items(id%2FvideoId)&' + \
+                f'pageToken={npt}&' + \
+                f'key={self.key}'
             r = json.loads(requests.get(url).text)
             try:
                 npt = r['nextPageToken']
             except:
                 npt = None
             for i in range(len(r['items'])):
-                ret.append((r['items'][i]['id']['videoId'], r['items'][i]['snippet']['publishedAt']))
-        
+                ret.append(r['items'][i]['id']['videoId'])
         return ret
 
 class video():
@@ -73,13 +94,13 @@ class video():
         part=contentDetails&
         id=uDjeOcBPxfk&
         fields=
-            items(snippet%2FpublishedAt)%2C%20
-            items(snippet%2Ftitle)%2C%20
-            items(snippet%2Fdescription)%2C%20
-            items(snippet%2Ftags)%2C%20
-            items(snippet%2FliveBroadcastContent)%2C%20
-            items(contentDetails%2Fduration)%2C%20
-            items(contentDetails%2Fdefinition)&
+            items(
+                snippet%2FpublishedAt%2C%20
+                snippet%2Fdescription%2C%20
+                snippet%2Ftags%2C%20
+                snippet%2FliveBroadcastContent%2C%20
+                contentDetails%2Fduration%2C%20
+                contentDetails%2Fdefinition&
         key=[YOUR_API_KEY]
         """
     
@@ -95,7 +116,8 @@ class video():
         videoId=uDjeOcBPxfk&
         fields=
             nextPageToken%2C%20
-            items(snippet%2FtopLevelComment%2Fsnippet%2FtextOriginal)%2C%20
-            items(snippet%2FtopLevelComment%2Fsnippet%2FpublishedAt)&
+            items(
+                snippet%2FtopLevelComment%2Fsnippet%2FtextOriginal%2C%20
+                snippet%2FtopLevelComment%2Fsnippet%2FpublishedAt)&
         key=[YOUR_API_KEY]
         """
