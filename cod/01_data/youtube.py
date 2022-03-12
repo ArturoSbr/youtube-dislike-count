@@ -66,7 +66,6 @@ class channel():
             except:
                 npt = None
             # Extract all comments on page
-            print(url)
             for i in range(len(r['items'])):
                 ret.append(r['items'][i]['id']['videoId'])
         return ret
