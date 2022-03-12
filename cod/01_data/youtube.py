@@ -32,7 +32,7 @@ class channel():
         date1 = date1.replace(':','%3A')
         ret = []
 
-        # Get first page
+        # First page
         url = 'https://youtube.googleapis.com/youtube/v3/search?' + \
             'part=id&' + \
             f'channelId={self.id}&' + \
@@ -55,7 +55,7 @@ class channel():
         for i in range(len(r['items'])):
             ret.append(r['items'][i]['id']['videoId'])
 
-        # Get subsequent requests
+        # Subsequent pages
         while npt is not None:
             url = 'https://youtube.googleapis.com/youtube/v3/search?' + \
                 'part=id&' + \
@@ -81,43 +81,70 @@ class channel():
                 ret.append(r['items'][i]['id']['videoId'])
         return ret
 
+# Video class
 class video():
     # Initialize object
     def __init__(self, id=None, key=None):
         self.id = id
+        self.key = key
 
     # Get video's details (title, tags, etc)
     def get_details(self):
-        """
-        https://youtube.googleapis.com/youtube/v3/videos?
-        part=snippet&
-        part=contentDetails&
-        id=uDjeOcBPxfk&
-        fields=
-            items(
-                snippet%2FpublishedAt%2C%20
-                snippet%2Fdescription%2C%20
-                snippet%2Ftags%2C%20
-                snippet%2FliveBroadcastContent%2C%20
-                contentDetails%2Fduration%2C%20
-                contentDetails%2Fdefinition&
-        key=[YOUR_API_KEY]
-        """
+        url = 'https://youtube.googleapis.com/youtube/v3/videos?' + \
+            'part=snippet&' + \
+            'part=contentDetails&' + \
+            f'id={self.id}&' + \
+            'fields=' + \
+                'items(' + \
+                    'snippet%2FpublishedAt%2C%20' + \
+                    'snippet%2Fdescription%2C%20' + \
+                    'snippet%2Ftags%2C%20' + \
+                    'snippet%2FliveBroadcastContent%2C%20' \
+                    'contentDetails%2Fduration%2C%20' + \
+                    'contentDetails%2Fdefinition)&' + \
+            f'key={self.key}'
+        r = json.loads(requests.get(url).text)['items'][0]
+        return {**r['snippet'], **r['contentDetails']}
     
     # Get video's top-level comments
     def get_comments(self):
-        """
-        https://youtube.googleapis.com/youtube/v3/commentThreads?
-        part=snippet&
-        maxResults=50&
-        moderationStatus=published&
-        order=time&
-        textFormat=plainText&
-        videoId=uDjeOcBPxfk&
-        fields=
-            nextPageToken%2C%20
-            items(
-                snippet%2FtopLevelComment%2Fsnippet%2FtextOriginal%2C%20
-                snippet%2FtopLevelComment%2Fsnippet%2FpublishedAt)&
-        key=[YOUR_API_KEY]
-        """
+        # First page
+        url = 'https://youtube.googleapis.com/youtube/v3/commentThreads?' + \
+            'part=snippet&' + \
+            'maxResults=50&' + \
+            'moderationStatus=published&' + \
+            'order=time&' + \
+            'textFormat=plainText&' + \
+            f'videoId={self.id}&' + \
+            'fields=' + \
+                'nextPageToken%2C%20' + \
+                'items(' + \
+                    'snippet%2FtopLevelComment%2Fsnippet%2FtextOriginal%2C%20' + \
+                    'snippet%2FtopLevelComment%2Fsnippet%2FpublishedAt)&' + \
+            f'key={self.key}'
+        r = json.loads(requests.get(url=url).text)
+        # Declare next page's token
+        try:
+            npt = r['nextPageToken']
+        except:
+            npt = None
+        # Extract all comments from current page
+        ret = []
+        for d in r['items']:
+            ret.append(d['snippet']['topLevelComment']['snippet'])
+        
+        # Subsequent pages
+        while npt is not None:
+            # Get next URL using previous token
+            url += f'&pageToken={npt}'
+            r = json.loads(requests.get(url=url).text)
+            # Update next page's token
+            try:
+                npt = r['nextPageToken']
+            except:
+                npt = None
+            # Extract all comments
+            for d in r['items']:
+                ret.append(d['snippet']['topLevelComment']['snippet'])
+        # Return all comments
+        return ret
