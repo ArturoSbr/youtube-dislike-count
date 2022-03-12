@@ -58,7 +58,7 @@ class channel():
         # Subsequent pages
         while npt is not None:
             # Get next URL using previous token
-            url += f'pageToken={npt}'
+            url += f'&pageToken={npt}'
             r = json.loads(requests.get(url).text)
             # Update next page's token
             try:
@@ -66,6 +66,7 @@ class channel():
             except:
                 npt = None
             # Extract all comments on page
+            print(url)
             for i in range(len(r['items'])):
                 ret.append(r['items'][i]['id']['videoId'])
         return ret
