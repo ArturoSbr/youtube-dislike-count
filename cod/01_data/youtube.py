@@ -57,26 +57,15 @@ class channel():
 
         # Subsequent pages
         while npt is not None:
-            url = 'https://youtube.googleapis.com/youtube/v3/search?' + \
-                'part=id&' + \
-                f'channelId={self.id}&' + \
-                'maxResults=50&' + \
-                'order=relevance&' + \
-                f'publishedAfter={date0}Z&' + \
-                f'publishedBefore={date1}Z&' + \
-                'safeSearch=none&' + \
-                'type=video&' + \
-                f'videoCategoryId={25}&' + \
-                'fields=' + \
-                    'nextPageToken%2C%20' + \
-                    'items(id%2FvideoId)&' + \
-                f'pageToken={npt}&' + \
-                f'key={self.key}'
+            # Get next URL using previous token
+            url += f'pageToken={npt}'
             r = json.loads(requests.get(url).text)
+            # Update next page's token
             try:
                 npt = r['nextPageToken']
             except:
                 npt = None
+            # Extract all comments on page
             for i in range(len(r['items'])):
                 ret.append(r['items'][i]['id']['videoId'])
         return ret
