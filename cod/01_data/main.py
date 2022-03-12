@@ -8,21 +8,20 @@ load_dotenv()
 key = os.getenv('API_KEY')
 
 # Declare objects
-cnn = channel(id='UCupvZG-5ko_eiXAupbDfxWw', key=key)
-vid = video(id='ewKg8DkwcLc', key=key)
+cnn = channel(id='UCupvZG-5ko_eiXAupbDfxWw', key=key)   # CNN's channel
+vid = video(id='ewKg8DkwcLc', key=key)                  # CNN's video on Rudy Giuliani
 
-# WORKS: channel.get_info()
-# print(cnn.get_info())
-# print(cnn.name
+# Get CNN's general information
+print(cnn.get_info())
+print(cnn.name)
 
-# WORKS: channel.get_videos()
-# vids = cnn.get_videos(category=25, date0='2021-11-01T00:00:00', date1='2021-11-09T23:59:59')
-# print(len(vids))
-# print(vids)
+# Get the IDs of videos uploaded by CNN between two dates
+vids = cnn.get_videos(category=25, date0='2021-10-31T00:00:00', date1='2021-10-31T23:59:59')
+print(len(vids))
 
-# WORKS: video.get_details()
-# print(vid.get_details())
+# Get some of the video's attributes
+print(vid.get_details())
 
-# TEST: video.get_comments()
-# comments = vid.get_comments()
-# print(len(comments))
+# Fetch all the comments posted on the video
+comments = vid.get_comments()
+print(len(comments))
