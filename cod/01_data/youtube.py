@@ -1,3 +1,20 @@
+# TODO Dump comments per page
+"""
+{
+    "videoId":"videoidvideoidvideoid",
+    "pageToken":"tokentokentokentoken",
+    "comments":{
+        "comment1":{
+            "date":"2021-11-09",
+            "text":"I hate this channel so much"
+        },
+        "comment2":{
+            "date":"2021-11-09",
+            "text":"I miss Belgium"
+        }
+ }
+"""
+
 # Libraries
 import json
 import requests
@@ -47,27 +64,27 @@ class channel():
                 'nextPageToken%2C%20' + \
                 'items(id%2FvideoId)&' + \
             f'key={self.key}'
-        r = json.loads(requests.get(url).text)
+        r = json.loads(requests.get(url).text)['items']
         try:
             npt = r['nextPageToken']
         except:
             npt = None
-        for i in range(len(r['items'])):
-            ret.append(r['items'][i]['id']['videoId'])
+        for item in r:
+            ret.append(item['id']['videoId'])
 
         # Subsequent pages
         while npt is not None:
             # Get next URL using previous token
             url += f'&pageToken={npt}'
-            r = json.loads(requests.get(url).text)
+            r = json.loads(requests.get(url).text)['items']
             # Update next page's token
             try:
                 npt = r['nextPageToken']
             except:
                 npt = None
             # Extract all comments on page
-            for i in range(len(r['items'])):
-                ret.append(r['items'][i]['id']['videoId'])
+            for item in r:
+                ret.append(item['id']['videoId'])
         return ret
 
 # Video class
