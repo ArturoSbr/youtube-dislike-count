@@ -149,6 +149,7 @@ class video():
     
     # Get video's top-level comments
     def get_comments(self):
+        
         # Initialize list
         ret = []
 
@@ -167,28 +168,35 @@ class video():
                     'snippet%2FtopLevelComment%2Fsnippet%2FpublishedAt)&' + \
             f'key={self.key}'
         r = json.loads(requests.get(url=url0).text)
-        # Declare next page's token
+
+        # Get comments (if enabled)
         try:
-            npt = r['nextPageToken']
-        except:
-            npt = None
-        # Extract all comments from current page
-        for item in r['items']:
-            ret.append(item['snippet']['topLevelComment']['snippet'])
-        
-        # Subsequent pages
-        while npt is not None:
-            # Get next URL using previous token
-            url = url0 + f'&pageToken={npt}'
-            r = json.loads(requests.get(url=url).text)
-            # Update next page's token
+            # Declare next page's token
             try:
                 npt = r['nextPageToken']
             except:
                 npt = None
-            # Extract all comments
+            # Extract all comments from current page
             for item in r['items']:
                 ret.append(item['snippet']['topLevelComment']['snippet'])
+            
+            # Subsequent pages
+            while npt is not None:
+                # Get next URL using previous token
+                url = url0 + f'&pageToken={npt}'
+                r = json.loads(requests.get(url=url).text)
+                # Update next page's token
+                try:
+                    npt = r['nextPageToken']
+                except:
+                    npt = None
+                # Extract all comments
+                for item in r['items']:
+                    ret.append(item['snippet']['topLevelComment']['snippet'])
+        
+        # Case when comments are disabled
+        except:
+            print(r['error']['errors'][0]['reason'], f'on videoId = {self.id}')
         
         # Return all comments
         return ret
