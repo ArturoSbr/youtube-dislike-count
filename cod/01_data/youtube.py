@@ -1,6 +1,33 @@
 # TODO Dump comments per page
 """
 {
+  "items": [
+    {
+      "snippet": {
+        "topLevelComment": {
+          "snippet": {
+            "textOriginal": "Watch Bundesliga Highlights on YouTube!\n► Sub now 👉 https://redirect.bundesliga.com/_bwCS",
+            "publishedAt": "2022-03-12T22:23:29Z"
+          }
+        }
+      }
+    },
+    {
+      "snippet": {
+        "topLevelComment": {
+          "snippet": {
+            "textOriginal": "Schade FC BAYERN ... hatten nicht viel Glueck",
+            "publishedAt": "2022-03-14T13:14:10Z"
+          }
+        }
+      }
+    },
+  ]
+}
+"""
+
+"""
+{
     "videoId":"videoidvideoidvideoid",
     "pageToken":"tokentokentokentoken",
     "comments":{
@@ -103,14 +130,20 @@ class video():
             'fields=' + \
                 'items(' + \
                     'snippet%2FpublishedAt%2C%20' + \
+                    'snippet%2Ftitle%2C%20' + \
                     'snippet%2Fdescription%2C%20' + \
                     'snippet%2Ftags%2C%20' + \
                     'snippet%2FliveBroadcastContent%2C%20' \
                     'contentDetails%2Fduration%2C%20' + \
-                    'contentDetails%2Fdefinition)&' + \
+                    'contentDetails%2Fdefinition%2C%20)&' + \
             f'key={self.key}'
         r = json.loads(requests.get(url).text)['items'][0]
-        return {**r['snippet'], **r['contentDetails']}
+        ret = {**r['snippet'], **r['contentDetails']}
+        try:
+            ret['tags'] = ', '.join(ret['tags'])
+        except:
+            ret['tags'] = ''
+        return dict(sorted(ret.items()))
     
     # Get video's top-level comments
     def get_comments(self):
