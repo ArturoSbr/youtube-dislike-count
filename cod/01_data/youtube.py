@@ -147,6 +147,8 @@ class video():
     
     # Get video's top-level comments
     def get_comments(self):
+        # Initialize lists
+        ret = []
         # First page
         url = 'https://youtube.googleapis.com/youtube/v3/commentThreads?' + \
             'part=snippet&' + \
@@ -168,9 +170,8 @@ class video():
         except:
             npt = None
         # Extract all comments from current page
-        ret = []
-        for d in r['items']:
-            ret.append(d['snippet']['topLevelComment']['snippet'])
+        for item in r['items']:
+            ret.append(item['snippet']['topLevelComment']['snippet'])
         
         # Subsequent pages
         while npt is not None:
@@ -183,7 +184,7 @@ class video():
             except:
                 npt = None
             # Extract all comments
-            for d in r['items']:
-                ret.append(d['snippet']['topLevelComment']['snippet'])
+            for item in r['items']:
+                ret.append(item['snippet']['topLevelComment']['snippet'])
         # Return all comments
         return ret
