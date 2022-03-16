@@ -1,47 +1,3 @@
-# TODO Dump comments per page
-"""
-{
-  "items": [
-    {
-      "snippet": {
-        "topLevelComment": {
-          "snippet": {
-            "textOriginal": "Watch Bundesliga Highlights on YouTube!\n► Sub now 👉 https://redirect.bundesliga.com/_bwCS",
-            "publishedAt": "2022-03-12T22:23:29Z"
-          }
-        }
-      }
-    },
-    {
-      "snippet": {
-        "topLevelComment": {
-          "snippet": {
-            "textOriginal": "Schade FC BAYERN ... hatten nicht viel Glueck",
-            "publishedAt": "2022-03-14T13:14:10Z"
-          }
-        }
-      }
-    },
-  ]
-}
-"""
-
-"""
-{
-    "videoId":"videoidvideoidvideoid",
-    "pageToken":"tokentokentokentoken",
-    "comments":{
-        "comment1":{
-            "date":"2021-11-09",
-            "text":"I hate this channel so much"
-        },
-        "comment2":{
-            "date":"2021-11-09",
-            "text":"I miss Belgium"
-        }
- }
-"""
-
 # Libraries
 import json
 import requests
@@ -148,6 +104,7 @@ class video():
         return dict(sorted(ret.items()))
     
     # Get video's top-level comments
+    # TODO Return two objects: ErrorCode, JSON
     def get_comments(self):
         
         # Initialize list
