@@ -1,0 +1,15 @@
+# Ignore jupyter cache
+.env
+__pycache__
+.ipynb_checkpoints
+
+# Ignore file types
+.csv
+.pdf
+.json
+.png
+
+# Ignore directories
+fig/
+doc/
+dat/comments
