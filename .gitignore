@@ -13,3 +13,6 @@ __pycache__
 fig/
 doc/
 dat/comments
+
+# Ignore dico-disco module
+disco.py
