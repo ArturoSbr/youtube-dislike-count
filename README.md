@@ -1,4 +1,4 @@
-# Removing the dislike count from YouTube
+# Removing Dislike Counts From YouTube
 
 This repository contains the code for *Displaying Anonymized Dislike Counts as a Means to Reduce Negative Online Comments*.
 
